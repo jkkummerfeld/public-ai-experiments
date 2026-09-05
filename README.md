@@ -12,7 +12,6 @@ tracked:
 | City | Feed file | Workflow |
 | --- | --- | --- |
 | Sydney | `feed/sydney-deals.xml` | `.github/workflows/sydney-deal-feed.yml` |
-| Berlin | `feed/berlin-deals.xml` | `.github/workflows/berlin-deal-feed.yml` |
 
 Each city has its own GitHub Actions workflow that runs every 6 hours and
 commits its feed file back to the repo, so no credentials or secrets are
