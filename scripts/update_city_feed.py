@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-Check theflightdeal.com for posts that mention a flight to/from Sydney, and
-add any new ones to a local RSS feed file that can be subscribed to
-directly in an RSS reader (e.g. Feedly).
+Check theflightdeal.com for posts that mention a flight to/from a given
+city, and add any new ones to a local RSS feed file that can be subscribed
+to directly in an RSS reader (e.g. Feedly).
 
-Meant to run on a schedule (see .github/workflows/sydney-deal-feed.yml),
-which commits the updated feed file back to the repo whenever new matches
-are found. The output feed accumulates matches over time (deduped by
-link), capped by --max-items / --max-age-days so it doesn't grow forever.
+Meant to run on a schedule (see .github/workflows/*-deal-feed.yml), which
+commits the updated feed file back to the repo whenever new matches are
+found. The output feed accumulates matches over time (deduped by link),
+capped by --max-items / --max-age-days so it doesn't grow forever.
 
 Usage:
-    python3 scripts/update_sydney_feed.py [--output feed/sydney-deals.xml]
-                                           [--max-items 100] [--max-age-days 180]
-                                           [--dry-run]
+    python3 scripts/update_city_feed.py --city Sydney [--output feed/sydney-deals.xml]
+                                         [--max-items 100] [--max-age-days 180]
+                                         [--dry-run]
 """
 import argparse
 import sys
@@ -23,12 +23,6 @@ from datetime import datetime, timedelta, timezone
 from email.utils import format_datetime, parsedate_to_datetime
 
 SOURCE_FEED_URL = "https://www.theflightdeal.com/feed/"
-DEFAULT_OUTPUT = "feed/sydney-deals.xml"
-FEED_TITLE = "The Flight Deal: Sydney"
-FEED_DESCRIPTION = (
-    "Posts from theflightdeal.com that mention a flight to/from Sydney, "
-    "checked every 6 hours."
-)
 FEED_LINK = "https://www.theflightdeal.com/"
 # The site returns 403 to requests without a browser-like User-Agent.
 USER_AGENT = (
@@ -79,9 +73,9 @@ def parse_existing_output(path):
     return _parse_items(ET.fromstring(data))
 
 
-def mentions_sydney(item):
+def mentions_city(item, city):
     haystacks = [item["title"], item["description"]] + item["categories"]
-    return any("sydney" in (text or "").lower() for text in haystacks)
+    return any(city.lower() in (text or "").lower() for text in haystacks)
 
 
 def merge_items(existing, new_matches, max_items, max_age_days):
@@ -106,14 +100,14 @@ def _cdata(text):
     return text.replace("]]>", "]]]]><![CDATA[>")
 
 
-def render_feed(items):
+def render_feed(items, title, description):
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<rss version="2.0">',
         "<channel>",
-        f"<title>{saxutils.escape(FEED_TITLE)}</title>",
+        f"<title>{saxutils.escape(title)}</title>",
         f"<link>{saxutils.escape(FEED_LINK)}</link>",
-        f"<description>{saxutils.escape(FEED_DESCRIPTION)}</description>",
+        f"<description>{saxutils.escape(description)}</description>",
         f"<lastBuildDate>{format_datetime(datetime.now(timezone.utc))}</lastBuildDate>",
     ]
     for item in items:
@@ -133,7 +127,10 @@ def render_feed(items):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", default=DEFAULT_OUTPUT, help="Path to the output feed file")
+    parser.add_argument(
+        "--city", required=True, help="City to match against (e.g. Sydney, Berlin)"
+    )
+    parser.add_argument("--output", required=True, help="Path to the output feed file")
     parser.add_argument(
         "--max-items", type=int, default=100, help="Cap on entries kept in the output feed"
     )
@@ -147,18 +144,24 @@ def main():
     )
     args = parser.parse_args()
 
+    feed_title = f"The Flight Deal: {args.city}"
+    feed_description = (
+        f"Posts from theflightdeal.com that mention a flight to/from {args.city}, "
+        "checked every 6 hours."
+    )
+
     source_items = parse_source_items(fetch_source_feed())
-    matches = [item for item in source_items if mentions_sydney(item)]
+    matches = [item for item in source_items if mentions_city(item, args.city)]
 
     existing = parse_existing_output(args.output)
     existing_links = {item["link"] for item in existing}
     new_matches = [item for item in matches if item["link"] not in existing_links]
 
     if not new_matches:
-        print("No new Sydney flight deals found.")
+        print(f"No new {args.city} flight deals found.")
         return 0
 
-    print(f"Found {len(new_matches)} new Sydney flight deal(s):")
+    print(f"Found {len(new_matches)} new {args.city} flight deal(s):")
     for item in new_matches:
         print(f"- {item['title']}\n  {item['link']}")
 
@@ -167,7 +170,7 @@ def main():
 
     merged = merge_items(existing, new_matches, args.max_items, args.max_age_days)
     with open(args.output, "w", encoding="utf-8") as f:
-        f.write(render_feed(merged))
+        f.write(render_feed(merged, feed_title, feed_description))
     print(f"Wrote {len(merged)} entries to {args.output}.")
     return 0
 
