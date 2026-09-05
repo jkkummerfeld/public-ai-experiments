@@ -1,4 +1,4 @@
-name: Update Sydney flight deal feed
+name: Update Berlin flight deal feed
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: sydney-deal-feed
+  group: berlin-deal-feed
   cancel-in-progress: false
 
 jobs:
@@ -23,16 +23,16 @@ jobs:
           python-version: '3.12'
 
       - name: Update feed
-        run: python3 scripts/update_city_feed.py --city Sydney --output feed/sydney-deals.xml
+        run: python3 scripts/update_city_feed.py --city Berlin --output feed/berlin-deals.xml
 
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add feed/sydney-deals.xml
+          git add feed/berlin-deals.xml
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Update Sydney flight deal feed"
+            git commit -m "Update Berlin flight deal feed"
             git push
           fi
