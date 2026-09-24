@@ -46,8 +46,10 @@ OpenReview and poster/oral times from the conference schedule. Write your
 interests one per line and papers are ranked by embedding similarity, using
 the static [model2vec](https://github.com/MinishLab/model2vec) model
 `potion-base-8M` running in the browser, with a small bonus for exact
-keyword matches. Star papers to get "more like your stars" suggestions and
-a "My schedule" view grouped by poster session, room and board number.
+keyword matches. Mark each paper "Definitely want", "Considering" or "Not
+interested": your picks pull similar papers up, not-interested ones push
+similar papers down, and "My schedule" lists definite and tentative papers
+by poster session, room and board number.
 
 Serve the folder over HTTP so the page can load the model files
 (`python -m http.server -d colm2026`). Opened from `file://`, the model

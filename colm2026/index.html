@@ -9,7 +9,8 @@
   --bg:#F5F6F4; --surface:#FFFFFF; --sunk:#ECEEEB; --line:#D9DDD8;
   --ink:#1B2230; --ink-2:#4A5362; --ink-3:#7A8290;
   --accent:#2E4BC6; --accent-soft:#E3E8FB; --on-accent:#FFFFFF;
-  --mark:#FFE58A; --star:#C98A00; --oral:#8A3FB8; --oral-soft:#F2E7F8;
+  --mark:#FFE58A; --oral:#8A3FB8; --oral-soft:#F2E7F8;
+  --want:#1D7A4B; --want-soft:#DDF1E5; --maybe:#9A6300; --maybe-soft:#FBEFD5; --no:#7A8290;
   --serif:"Newsreader",Georgia,"Times New Roman",serif;
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -19,14 +20,16 @@
   --bg:#12161D; --surface:#1A2029; --sunk:#222935; --line:#2E3644;
   --ink:#E7EAF0; --ink-2:#B3BAC6; --ink-3:#848C99;
   --accent:#8FA5FF; --accent-soft:#26305A; --on-accent:#0F1320;
-  --mark:rgba(255,212,84,.30); --star:#F2C14E; --oral:#D19BF0; --oral-soft:#34264A;
+  --mark:rgba(255,212,84,.30); --oral:#D19BF0; --oral-soft:#34264A;
+  --want:#5CC98E; --want-soft:#173A2A; --maybe:#E9B44C; --maybe-soft:#3D3019; --no:#8A93A1;
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#12161D; --surface:#1A2029; --sunk:#222935; --line:#2E3644;
   --ink:#E7EAF0; --ink-2:#B3BAC6; --ink-3:#848C99;
   --accent:#8FA5FF; --accent-soft:#26305A; --on-accent:#0F1320;
-  --mark:rgba(255,212,84,.30); --star:#F2C14E; --oral:#D19BF0; --oral-soft:#34264A;
+  --mark:rgba(255,212,84,.30); --oral:#D19BF0; --oral-soft:#34264A;
+  --want:#5CC98E; --want-soft:#173A2A; --maybe:#E9B44C; --maybe-soft:#3D3019; --no:#8A93A1;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -60,10 +63,24 @@ main{display:flex;flex-direction:column;gap:12px;min-width:0}
 .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .count{color:var(--ink-2);font-size:13px;font-variant-numeric:tabular-nums}
 .sort{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink-3)}
-.seed{display:flex;gap:8px;align-items:center;background:var(--accent-soft);border-radius:6px;padding:8px 12px;font-size:13px}
-.seed b{font-weight:600}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px}
-.card.starred{border-color:color-mix(in srgb,var(--star) 55%,var(--line))}
+.card.want{border-color:color-mix(in srgb,var(--want) 60%,var(--line))}
+.card.maybe{border-color:color-mix(in srgb,var(--maybe) 55%,var(--line))}
+.card.no{opacity:.72}
+.status{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.status button{display:inline-flex;align-items:center;gap:5px;border:0;border-right:1px solid var(--line);background:transparent;color:var(--ink-2);font:500 12.5px var(--sans);padding:5px 10px;cursor:pointer}
+.status button:last-child{border-right:0}
+.status button svg{width:14px;height:14px;flex:none}
+.status button:hover{color:var(--ink);background:var(--sunk)}
+.status button[data-v="want"][aria-pressed="true"]{background:var(--want-soft);color:var(--want)}
+.status button[data-v="maybe"][aria-pressed="true"]{background:var(--maybe-soft);color:var(--maybe)}
+.status button[data-v="no"][aria-pressed="true"]{background:var(--sunk);color:var(--ink)}
+.status.compact button{padding:5px 7px}
+.pill{font:500 11px var(--mono);padding:1px 7px;border-radius:4px;white-space:nowrap}
+.pill.want{background:var(--want-soft);color:var(--want)}
+.pill.maybe{background:var(--maybe-soft);color:var(--maybe)}
+tr.maybe td{color:var(--ink-2)}
+tr.maybe .t{font-weight:500}
 .meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font:12px var(--mono);color:var(--ink-3);font-variant-numeric:tabular-nums}
 .meta .ps{color:var(--ink-2);font-weight:500}
 .tag-oral{background:var(--oral-soft);color:var(--oral);padding:1px 7px;border-radius:4px;font-weight:500}
@@ -85,7 +102,6 @@ mark{background:var(--mark);color:inherit;padding:0 1px;border-radius:2px}
 .btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font:500 12.5px var(--sans);padding:5px 10px;border-radius:6px;cursor:pointer;text-decoration:none}
 .btn:hover{border-color:var(--ink-3);color:var(--ink)}
 .btn svg{width:14px;height:14px;flex:none}
-.btn.on{color:var(--star);border-color:color-mix(in srgb,var(--star) 60%,var(--line))}
 .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .more{align-self:center;margin-top:6px}
 .empty{padding:32px;text-align:center;color:var(--ink-3);border:1px dashed var(--line);border-radius:8px}
@@ -95,6 +111,8 @@ mark{background:var(--mark);color:inherit;padding:0 1px;border-radius:2px}
 .slot .when{font:12px var(--mono);color:var(--ink-3);margin:0 0 8px}
 .tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
 table{border-collapse:collapse;width:100%;font-size:13px}
+.sched table{table-layout:fixed;min-width:640px}
+.sched th.c-room{width:150px}.sched th.c-when{width:150px}.sched th.c-board{width:72px}.sched th.c-pill{width:96px}.sched th.c-ctl{width:118px}
 td,th{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 tr:last-child td{border-bottom:0}
 th{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
@@ -113,7 +131,7 @@ td .a{color:var(--ink-3);font-size:12px}
     </div>
     <div class="tabs" role="tablist">
       <button role="tab" id="tab-browse" aria-selected="true">Find papers</button>
-      <button role="tab" id="tab-sched" aria-selected="false">My schedule <span id="starcount"></span></button>
+      <button role="tab" id="tab-sched" aria-selected="false">My schedule <span id="schedtab"></span></button>
     </div>
   </header>
 
@@ -134,11 +152,16 @@ td .a{color:var(--ink-3);font-size:12px}
       </section>
       <section>
         <p class="label"><span>Show</span></p>
-        <div class="chips">
-          <button class="chip" id="f-star" aria-pressed="false">Starred only</button>
+        <div class="chips" id="statusfilter">
+          <button class="chip" data-f="all" aria-pressed="true">All</button>
+          <button class="chip" data-f="none" aria-pressed="false">Undecided</button>
+          <button class="chip" data-f="want" aria-pressed="false">Definitely want</button>
+          <button class="chip" data-f="maybe" aria-pressed="false">Considering</button>
+          <button class="chip" data-f="no" aria-pressed="false">Not interested</button>
+        </div>
+        <div class="chips" style="margin-top:8px">
           <button class="chip" id="f-oral" aria-pressed="false">Orals</button>
           <button class="chip" id="f-link" aria-pressed="false">Has project page</button>
-          <button class="chip" id="f-hidden" aria-pressed="false">Hidden papers</button>
         </div>
       </section>
       <p class="sync" id="modelstat">Loading the embedding model (10 MB)… keyword matching until it is ready.</p>
@@ -155,7 +178,6 @@ td .a{color:var(--ink-3);font-size:12px}
           </span>
         </label>
       </div>
-      <div class="seed" id="seed" hidden></div>
       <div id="list" style="display:flex;flex-direction:column;gap:12px"></div>
       <button class="btn more" id="more" hidden>Show more</button>
     </main>
@@ -258,9 +280,22 @@ async function loadModel(){
 /* ---------- state ---------- */
 const EXAMPLE='dialogue and conversational agents\nhuman-AI collaboration\ntext-to-SQL and semantic parsing\nevaluation methodology and benchmarks\ncode generation';
 const LSKEY='colm26-scout';
-let st={interests:EXAMPLE,edited:false,stars:[],hidden:[]};
-try{const s=JSON.parse(localStorage.getItem(LSKEY)||'null');if(s)st=Object.assign(st,s)}catch(e){}
-let ui={view:'browse',q:'',sess:new Set(),fStar:false,fOral:false,fLink:false,fHidden:false,sort:'match',seed:null,limit:40};
+const SYNCED='Saved to your Claude account, so it follows you to other devices.';
+// status: paper id -> 'want' | 'maybe' | 'no'
+let st={interests:EXAMPLE,edited:false,status:{}};
+function adopt(d){
+  const out={};
+  // older saves kept stars / hidden lists
+  for(const id of d.stars||[])out[id]='want';
+  for(const id of d.hidden||[])out[id]='no';
+  for(const [id,v] of Object.entries(d.status||{}))if(v==='want'||v==='maybe'||v==='no')out[id]=v;
+  for(const id in out)if(!byId.has(id))delete out[id];
+  return out;
+}
+try{const s=JSON.parse(localStorage.getItem(LSKEY)||'null');if(s){st.interests=typeof s.interests==='string'?s.interests:EXAMPLE;st.edited=!!s.edited;st.status=adopt(s)}}catch(e){}
+const statusOf=id=>st.status[id]||'';
+const idsWith=v=>Object.keys(st.status).filter(id=>st.status[id]===v);
+let ui={view:'browse',q:'',sess:new Set(),filter:'all',fOral:false,fLink:false,sort:'match',limit:40};
 let dbDoc=null,saveTimer=null,saving=false,dirty=false;
 function persist(){
   try{localStorage.setItem(LSKEY,JSON.stringify(st))}catch(e){}
@@ -269,7 +304,7 @@ function persist(){
 }
 async function flush(){
   if(saving||!dirty||!dbDoc)return;saving=true;dirty=false;
-  try{await dbDoc.set({interests:st.interests,edited:st.edited,stars:st.stars,hidden:st.hidden});setSync('Saved to your Claude account — it follows you to other devices.')}
+  try{await dbDoc.set({interests:st.interests,edited:st.edited,status:st.status});setSync(SYNCED)}
   catch(e){setSync('Could not save to your account; saving in this browser only.')}
   saving=false;if(dirty)flush();
 }
@@ -282,22 +317,23 @@ function setSync(t){document.getElementById('sync').textContent=t}
     const uid=await user.id();if(!uid)return;
     const ref=db.doc('data/users/'+uid+'/state');
     const snap=await ref.get();
+    let push=!snap.exists&&(Object.keys(st.status).length||st.edited);
     if(snap.exists){const d=snap.data()||{};
-      const localHas=st.stars.length||st.hidden.length||st.edited;
-      if(!localHas||(d.stars&&d.stars.length)||d.edited){
-        st.interests=typeof d.interests==='string'?d.interests:st.interests;st.edited=!!d.edited;
-        st.stars=[...new Set([...(d.stars||[]),...st.stars])].filter(id=>byId.has(id));
-        st.hidden=[...new Set([...(d.hidden||[]),...st.hidden])].filter(id=>byId.has(id));
-        document.getElementById('interests').value=st.interests;recompute();render();
-      }
+      const remote=adopt(d),local=st.status;
+      st.status=Object.assign({},local,remote);
+      if(d.edited){st.interests=typeof d.interests==='string'?d.interests:st.interests;st.edited=true}
+      push=Object.keys(st.status).length!==Object.keys(remote).length||(!d.status&&(d.stars||d.hidden));
+      document.getElementById('interests').value=st.interests;
+      try{localStorage.setItem(LSKEY,JSON.stringify(st))}catch(e){}
+      recompute();render();
     }
-    dbDoc=ref;setSync('Saved to your Claude account — it follows you to other devices.');
-    if(!snap.exists&&(st.stars.length||st.edited)){dirty=true;flush()}
+    dbDoc=ref;setSync(SYNCED);
+    if(push){dirty=true;flush()}
   }catch(e){}
 })();
 
 /* ---------- scoring ---------- */
-let base=new Float32Array(N), whyTopics=[], hiTerms=new Set(), seedSim=null, starSim=null;
+let base=new Float32Array(N), whyTopics=[], hiTerms=new Set(), pickSim=null, noSim=null;
 const embCache=new Map();
 function embedLine(l){if(!model)return null;if(!embCache.has(l))embCache.set(l,model.embed(l));return embCache.get(l)}
 function topicScores(line){
@@ -313,10 +349,12 @@ function topicScores(line){
   for(let i=0;i<N;i++)sc[i]=.7*se[i]+.3*lx[i];
   return {sc:norm(sc),terms};
 }
-function computeStarSim(){
-  if(!st.stars.length){starSim=null;return}
-  const idxs=st.stars.map(id=>byId.get(id)).filter(i=>i!==undefined);
-  starSim=relScale(cosAll(meanVec(idxs)),new Set(idxs));
+// papers you want (and, at half weight, are considering) pull similar papers up; not-interested ones push similar papers down
+function computePickSim(){
+  const want=idsWith('want').map(id=>byId.get(id)),maybe=idsWith('maybe').map(id=>byId.get(id)),no=idsWith('no').map(id=>byId.get(id));
+  const marked=new Set([...want,...maybe,...no]);
+  if(want.length||maybe.length){const c=meanVec(want),m=meanVec(maybe);for(let d=0;d<DIM;d++)c[d]+=.5*m[d];pickSim=relScale(cosAll(c),marked)}else pickSim=null;
+  noSim=no.length?relScale(cosAll(meanVec(no)),marked):null;
 }
 function recompute(){
   const lines=st.interests.split('\n').map(s=>s.trim()).filter(Boolean);
@@ -325,14 +363,14 @@ function recompute(){
   base=new Float32Array(N);whyTopics=Array.from({length:N},()=>[]);
   for(let i=0;i<N;i++){let mx=0,sum=0;for(const r of pos){const v=r.sc[i];sum+=v;if(v>mx)mx=v;if(v>=.5)whyTopics[i].push([r.label,v])}
     let s=mx+.2*(sum-mx);for(const r of neg)s-=.6*r.sc[i];base[i]=s;whyTopics[i].sort((a,b)=>b[1]-a[1])}
-  computeStarSim();
+  computePickSim();
 }
 function scoresNow(){
   const qTerms=toks(ui.q), qLow=ui.q.trim().toLowerCase();
   let qs=null;
   if(qLow){qs=norm(bm25(qTerms));P.forEach((p,i)=>{if(qLow.length>=3&&p._auth.includes(qLow))qs[i]=Math.max(qs[i],1);if(qs[i]>0&&p._low.includes(qLow))qs[i]=Math.min(1,qs[i]*1.3)})}
   const out=new Float32Array(N);
-  for(let i=0;i<N;i++){let s=base[i];if(starSim)s+=.5*starSim[i];if(seedSim)s=seedSim[i]*2+.3*s;if(qs)s=qs[i]>0?qs[i]*2+.3*s:-1;out[i]=s}
+  for(let i=0;i<N;i++){let s=base[i];if(pickSim)s+=.5*pickSim[i];if(noSim)s-=.25*noSim[i];if(qs)s=qs[i]>0?qs[i]*2+.3*s:-Infinity;out[i]=s}
   return {out,qTerms,qs};
 }
 
@@ -341,10 +379,9 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function hl(text,set){if(!set.size)return esc(text);let out='',last=0;for(const m of text.matchAll(/[A-Za-z0-9]+/g)){const w=m[0].toLowerCase();out+=esc(text.slice(last,m.index));out+=(w.length>1&&set.has(stem(w)))?'<mark>'+esc(m[0])+'</mark>':esc(m[0]);last=m.index+m[0].length}return out+esc(text.slice(last))}
 const ICON={
-  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
-  starOn:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
-  hide:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c5 0 9 5 9 7a9 9 0 0 1-2.3 3.1M6.2 6.3C4 7.7 3 10.6 3 12c0 2 4 7 9 7a9.6 9.6 0 0 0 4.3-1"/></svg>',
-  like:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M11 8v6M8 11h6"/></svg>',
+  want:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  maybe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.4M12 16.8v.1"/></svg>',
+  no:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>',
   ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
 };
 function metaLine(p){
@@ -353,11 +390,15 @@ function metaLine(p){
   if(p.o){const d=p.o[0].split(' ')[0];m+='<span class="tag-oral">Oral · '+d[0]+d.slice(1).toLowerCase()+' '+esc(p.o[1])+' · '+esc(p.o[2])+'</span>'}
   return m;
 }
+const STATUS=[['want','Definitely want'],['maybe','Considering'],['no','Not interested']];
+function statusCtl(v,compact){
+  return '<span class="status'+(compact?' compact':'')+'" role="group" aria-label="Your decision">'+STATUS.map(([k,l])=>'<button data-v="'+k+'" aria-pressed="'+(v===k)+'"'+(compact?' aria-label="'+l+'" title="'+l+'">'+ICON[k]:'>'+ICON[k]+l)+'</button>').join('')+'</span>';
+}
 function card(p,i,score,top,terms){
-  const starred=st.stars.includes(p.id), hidden=st.hidden.includes(p.id);
-  const why=whyTopics[i].slice(0,3).map(w=>'<span>'+esc(w[0])+'</span>').join('')+(starSim&&starSim[i]>.6?'<span>like your stars</span>':'');
+  const v=statusOf(p.id);
+  const why=whyTopics[i].slice(0,3).map(w=>'<span>'+esc(w[0])+'</span>').join('')+(pickSim&&!v&&pickSim[i]>.6?'<span>like your picks</span>':'');
   const pct=top>0?Math.max(0,Math.min(1,score/top)):0;
-  return '<article class="card'+(starred?' starred':'')+'" data-id="'+p.id+'">'+
+  return '<article class="card'+(v?' '+v:'')+'" data-id="'+p.id+'">'+
     '<div class="meta">'+metaLine(p)+'</div>'+
     '<div><h3>'+hl(p.t,terms)+'</h3><p class="authors">'+hl(p.a.join(', '),new Set())+'</p>'+(why?'<div class="why">'+why+'</div>':'')+
     (p.tl?'<p class="tldr">'+hl(p.tl,terms)+'</p>':'')+
@@ -365,63 +406,67 @@ function card(p,i,score,top,terms){
     (p.k.length?'<div class="kw">'+esc(p.k.join(' · '))+'</div>':'')+'</div>'+
     (ui.sort==='match'&&score>0?'<div class="score"><div class="meter"><i style="width:'+(pct*100).toFixed(0)+'%"></i></div><small>'+(pct*100).toFixed(0)+'</small></div>':'<div></div>')+
     '<div class="actions">'+
-      '<button class="btn'+(starred?' on':'')+'" data-act="star" aria-pressed="'+starred+'">'+(starred?ICON.starOn+'Starred':ICON.star+'Star')+'</button>'+
-      '<button class="btn" data-act="like">'+ICON.like+'More like this</button>'+
-      '<button class="btn" data-act="hide">'+ICON.hide+(hidden?'Unhide':'Hide')+'</button>'+
+      statusCtl(v,false)+
       '<a class="btn" href="https://openreview.net/forum?id='+p.id+'" target="_blank" rel="noopener">'+ICON.ext+'OpenReview</a>'+
       (p.l?'<a class="btn" href="'+esc(p.l)+'" target="_blank" rel="noopener">'+ICON.ext+'Project page</a>':'')+
     '</div></article>';
 }
 function render(){
-  $('starcount').textContent=st.stars.length?'('+st.stars.length+')':'';
+  const nw=idsWith('want').length,nm=idsWith('maybe').length;
+  $('schedtab').textContent=nw||nm?'('+nw+(nm?' + '+nm+'?':'')+')':'';
   $('exlabel').hidden=st.edited;
   if(ui.view==='sched')return renderSched();
   const {out,qTerms}=scoresNow();
   const terms=new Set([...hiTerms,...qTerms]);
-  let idx=[];const hid=new Set(st.hidden),sta=new Set(st.stars);
+  let idx=[],ruledOut=0;
   for(let i=0;i<N;i++){const p=P[i];
-    if(ui.fHidden?!hid.has(p.id):hid.has(p.id))continue;
     if(ui.sess.size&&!ui.sess.has(p.s))continue;
-    if(ui.fStar&&!sta.has(p.id))continue;
+    const v=statusOf(p.id);
+    if(ui.filter==='all'){if(v==='no'){ruledOut++;continue}}
+    else if(ui.filter==='none'){if(v)continue}
+    else if(v!==ui.filter)continue;
     if(ui.fOral&&!p.o)continue;
     if(ui.fLink&&!p.l)continue;
-    if(out[i]<0)continue;
-    if(ui.seed&&P[i].id===ui.seed)continue;
+    if(out[i]===-Infinity)continue;
     idx.push(i)}
   if(ui.sort==='match')idx.sort((a,b)=>out[b]-out[a]||a-b);
   else idx.sort((a,b)=>P[a].s-P[b].s||P[a].r.localeCompare(P[b].r)||P[a].n-P[b].n);
   const top=idx.length?Math.max(...idx.slice(0,1).map(i=>out[i])):0;
-  $('count').textContent=idx.length+' paper'+(idx.length===1?'':'s')+(ui.q?' matching “'+ui.q.trim()+'”':'');
-  const sd=$('seed');
-  if(ui.seed){const p=P[byId.get(ui.seed)];sd.hidden=false;sd.innerHTML='<span>Showing papers similar to <b>'+esc(p.t)+'</b></span><button class="btn" id="clearseed">Clear</button>'}else sd.hidden=true;
+  $('count').textContent=idx.length+' paper'+(idx.length===1?'':'s')+(ui.q?' matching “'+ui.q.trim()+'”':'')+(ruledOut?' · '+ruledOut+' marked not interested '+(ruledOut===1?'is':'are')+' hidden':'');
   const shown=idx.slice(0,ui.limit);
-  $('list').innerHTML=shown.length?shown.map(i=>card(P[i],i,out[i],top,terms)).join(''):'<div class="empty">No papers match these filters.</div>';
+  const EMPTY={want:'Nothing marked “Definitely want” yet.',maybe:'Nothing marked “Considering” yet.',no:'Nothing marked “Not interested”.'};
+  $('list').innerHTML=shown.length?shown.map(i=>card(P[i],i,out[i],top,terms)).join(''):'<div class="empty">'+(EMPTY[ui.filter]&&!ui.q&&!ui.sess.size?EMPTY[ui.filter]:'No papers match these filters.')+'</div>';
   $('more').hidden=idx.length<=ui.limit;
   $('more').textContent='Show '+Math.min(40,idx.length-ui.limit)+' more of '+(idx.length-ui.limit)+' remaining';
 }
+const ORDER={want:0,maybe:1};
+function planned(){return Object.keys(st.status).filter(id=>st.status[id]==='want'||st.status[id]==='maybe').map(id=>P[byId.get(id)])}
 function schedRows(){
-  const rows={};for(const id of st.stars){const p=P[byId.get(id)];if(p)(rows[p.s]=rows[p.s]||[]).push(p)}
+  const rows={};for(const p of planned())(rows[p.s]=rows[p.s]||[]).push(p);
   for(const s in rows)rows[s].sort((a,b)=>a.r.localeCompare(b.r)||a.n-b.n);return rows;
 }
+const pill=p=>statusOf(p.id)==='want'?'<span class="pill want">Want</span>':'<span class="pill maybe">Tentative</span>';
+function countLine(r){const w=r.filter(p=>statusOf(p.id)==='want').length,m=r.length-w;return [w?w+' definite':'',m?m+' tentative':''].filter(Boolean).join(' · ')}
 function renderSched(){
-  const rows=schedRows();
-  const orals=st.stars.map(id=>P[byId.get(id)]).filter(p=>p&&p.o);
-  $('schedcount').textContent=st.stars.length?st.stars.length+' starred paper'+(st.stars.length===1?'':'s')+', grouped by poster session and sorted by room and board number':'Star papers in “Find papers” to build your schedule.';
+  const rows=schedRows(),all=planned();
+  const orals=all.filter(p=>p.o);
+  $('schedcount').textContent=all.length?countLine(all)+'. Grouped by poster session and sorted by room and board number, so you can walk the rows in order.':'Mark papers “Definitely want” or “Considering” in Find papers to build your schedule.';
   let h='';
-  if(orals.length){h+='<section class="slot"><h2>Starred orals</h2><p class="when">Grand Ballroom · 15-minute talks</p><div class="tablewrap"><table><thead><tr><th>When</th><th>Paper</th></tr></thead><tbody>'+
-    orals.sort((a,b)=>a.o[0].localeCompare(b.o[0])||a.o[1].localeCompare(b.o[1])).map(p=>{const d=p.o[0].split(' ');return '<tr><td class="num">'+d[0][0]+d[0].slice(1).toLowerCase()+' '+d[1]+' Oct '+esc(p.o[1])+'</td><td><div class="t">'+esc(p.t)+'</div><div class="a">'+esc(p.o[2])+' · '+esc(p.a.join(', '))+'</div></td></tr>'}).join('')+'</tbody></table></div></section>'}
+  if(orals.length){h+='<section class="slot"><h2>Orals</h2><p class="when">Grand Ballroom · 15-minute talks · '+countLine(orals)+'</p><div class="tablewrap"><table><thead><tr><th class="c-when">When</th><th>Paper</th><th class="c-pill"></th><th class="c-ctl"></th></tr></thead><tbody>'+
+    orals.sort((a,b)=>a.o[0].localeCompare(b.o[0])||a.o[1].localeCompare(b.o[1])).map(p=>{const d=p.o[0].split(' ');return '<tr class="'+statusOf(p.id)+'" data-id="'+p.id+'"><td class="num">'+d[0][0]+d[0].slice(1).toLowerCase()+' '+d[1]+' Oct '+esc(p.o[1])+'</td><td><div class="t">'+esc(p.t)+'</div><div class="a">'+esc(p.o[2])+' · '+esc(p.a.join(', '))+'</div></td><td>'+pill(p)+'</td><td>'+statusCtl(statusOf(p.id),true)+'</td></tr>'}).join('')+'</tbody></table></div></section>'}
   for(let s=1;s<=6;s++){const L=sessLabel(s),r=rows[s]||[];
-    h+='<section class="slot"><h2>Poster Session '+s+'</h2><p class="when">'+esc(L.long)+' · '+r.length+' starred</p>';
-    if(!r.length)h+='<p class="none">Nothing starred in this session.</p>';
-    else h+='<div class="tablewrap"><table><thead><tr><th>Room</th><th>Board</th><th>Paper</th><th></th></tr></thead><tbody>'+r.map(p=>'<tr data-id="'+p.id+'"><td>'+esc(p.r)+'</td><td class="num">#'+p.n+'</td><td><div class="t">'+esc(p.t)+'</div><div class="a">'+esc(p.a.join(', '))+'</div></td><td><button class="btn" data-act="star" aria-label="Remove star">'+ICON.starOn+'</button></td></tr>').join('')+'</tbody></table></div>';
+    h+='<section class="slot"><h2>Poster Session '+s+'</h2><p class="when">'+esc(L.long)+(r.length?' · '+countLine(r):'')+'</p>';
+    if(!r.length)h+='<p class="none">Nothing planned in this session.</p>';
+    else h+='<div class="tablewrap"><table><thead><tr><th class="c-room">Room</th><th class="c-board">Board</th><th>Paper</th><th class="c-pill"></th><th class="c-ctl"></th></tr></thead><tbody>'+r.map(p=>'<tr class="'+statusOf(p.id)+'" data-id="'+p.id+'"><td>'+esc(p.r)+'</td><td class="num">#'+p.n+'</td><td><div class="t">'+esc(p.t)+'</div><div class="a">'+esc(p.a.join(', '))+'</div></td><td>'+pill(p)+'</td><td>'+statusCtl(statusOf(p.id),true)+'</td></tr>').join('')+'</tbody></table></div>';
     h+='</section>'}
   $('sched').innerHTML=h;
 }
 function schedText(){
-  const rows=schedRows();let t='My COLM 2026 schedule\n';
-  for(let s=1;s<=6;s++){const r=rows[s];if(!r)continue;t+='\nPoster Session '+s+' — '+sessLabel(s).long+'\n';for(const p of r)t+='  '+p.r+' #'+p.n+'  '+p.t+'\n    '+p.a.join(', ')+'\n    https://openreview.net/forum?id='+p.id+'\n'}
-  const orals=st.stars.map(id=>P[byId.get(id)]).filter(p=>p&&p.o);
-  if(orals.length){t+='\nOrals\n';for(const p of orals)t+='  '+p.o[0]+' '+p.o[1]+' ('+p.o[2]+')  '+p.t+'\n'}
+  const rows=schedRows();let t='My COLM 2026 schedule (? = tentative)\n';
+  const mark=p=>statusOf(p.id)==='maybe'?'? ':'  ';
+  for(let s=1;s<=6;s++){const r=rows[s];if(!r)continue;t+='\nPoster Session '+s+' — '+sessLabel(s).long+'\n';for(const p of r)t+=mark(p)+p.r+' #'+p.n+'  '+p.t+'\n    '+p.a.join(', ')+'\n    https://openreview.net/forum?id='+p.id+'\n'}
+  const orals=planned().filter(p=>p.o);
+  if(orals.length){t+='\nOrals\n';for(const p of orals)t+=mark(p)+p.o[0]+' '+p.o[1]+' ('+p.o[2]+')  '+p.t+'\n'}
   return t;
 }
 
@@ -432,18 +477,18 @@ ta.addEventListener('input',()=>{st.interests=ta.value;st.edited=true;persist();
 $('q').addEventListener('input',e=>{ui.q=e.target.value;ui.limit=40;clearTimeout(rt);rt=setTimeout(render,120)});
 $('sessions').innerHTML=[1,2,3,4,5,6].map(s=>{const L=sessLabel(s);const n=P.filter(p=>p.s===s).length;return '<button class="chip" data-s="'+s+'" aria-pressed="false">PS'+s+' '+esc(L.short.split(' ')[0])+'<small>'+esc(SESS[s].time.replace(':00',''))+' · '+n+'</small></button>'}).join('');
 $('sessions').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;const s=+b.dataset.s;ui.sess.has(s)?ui.sess.delete(s):ui.sess.add(s);b.setAttribute('aria-pressed',ui.sess.has(s));ui.limit=40;render()});
-for(const [id,key] of [['f-star','fStar'],['f-oral','fOral'],['f-link','fLink'],['f-hidden','fHidden']])$(id).addEventListener('click',e=>{ui[key]=!ui[key];e.currentTarget.setAttribute('aria-pressed',ui[key]);ui.limit=40;render()});
+$('statusfilter').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(!b)return;ui.filter=b.dataset.f;for(const c of $('statusfilter').children)c.setAttribute('aria-pressed',c===b);ui.limit=40;render()});
+for(const [id,key] of [['f-oral','fOral'],['f-link','fLink']])$(id).addEventListener('click',e=>{ui[key]=!ui[key];e.currentTarget.setAttribute('aria-pressed',ui[key]);ui.limit=40;render()});
 $('sortchips').addEventListener('click',e=>{const b=e.target.closest('[data-sort]');if(!b)return;ui.sort=b.dataset.sort;for(const c of $('sortchips').children)c.setAttribute('aria-pressed',c===b);render()});
 $('more').addEventListener('click',()=>{ui.limit+=40;render()});
-function toggle(arr,id){const k=arr.indexOf(id);k>=0?arr.splice(k,1):arr.push(id)}
 document.addEventListener('click',e=>{
-  if(e.target.closest('#clearseed')){ui.seed=null;seedSim=null;render();return}
-  const b=e.target.closest('[data-act]');if(!b)return;const id=b.closest('[data-id]').dataset.id;
-  const act=b.dataset.act;
-  if(act==='star'){toggle(st.stars,id);computeStarSim();persist();
-    if(ui.view==='browse'){const y=b.closest('.card').getBoundingClientRect().top;render();const el=document.querySelector('[data-id="'+id+'"]');if(el)window.scrollBy(0,el.getBoundingClientRect().top-y)}else render()}
-  else if(act==='hide'){toggle(st.hidden,id);if(st.hidden.includes(id))st.stars=st.stars.filter(x=>x!==id);persist();render()}
-  else if(act==='like'){ui.seed=id;seedSim=relScale(cosAll(paperVec(byId.get(id))),new Set([byId.get(id)]));ui.sort='match';for(const c of $('sortchips').children)c.setAttribute('aria-pressed',c.dataset.sort==='match');ui.limit=40;render();$('seed').scrollIntoView({block:'nearest'})}
+  const b=e.target.closest('.status [data-v]');if(!b)return;
+  const row=b.closest('[data-id]'),id=row.dataset.id,v=b.dataset.v;
+  if(st.status[id]===v)delete st.status[id];else st.status[id]=v;
+  computePickSim();persist();
+  // keep the clicked item where it was on screen while the list re-renders around it
+  const y=row.getBoundingClientRect().top;render();
+  const el=document.querySelector((ui.view==='browse'?'#list':'#sched')+' [data-id="'+id+'"]');if(el)window.scrollBy(0,el.getBoundingClientRect().top-y);
 });
 function setView(v){ui.view=v;$('tab-browse').setAttribute('aria-selected',v==='browse');$('tab-sched').setAttribute('aria-selected',v==='sched');$('view-browse').hidden=v!=='browse';$('view-sched').hidden=v!=='sched';render()}
 $('tab-browse').addEventListener('click',()=>setView('browse'));
