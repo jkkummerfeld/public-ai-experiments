@@ -37,3 +37,26 @@ the feed are kept (deduped by link) up to `--max-items` (default 100) and
 
 To track a new city, add a `feed/<city>-deals.xml` and copy
 `.github/workflows/berlin-deal-feed.yml`, swapping in the new city name.
+
+## COLM 2026 Paper Scout
+
+`colm2026/index.html` is a single-page tool for finding papers to see at
+COLM 2026. It covers all 856 accepted papers, with abstracts from
+OpenReview and poster/oral times from the conference schedule. Write your
+interests one per line and papers are ranked by embedding similarity, using
+the static [model2vec](https://github.com/MinishLab/model2vec) model
+`potion-base-8M` running in the browser, with a small bonus for exact
+keyword matches. Star papers to get "more like your stars" suggestions and
+a "My schedule" view grouped by poster session, room and board number.
+
+Serve the folder over HTTP so the page can load the model files
+(`python -m http.server -d colm2026`). Opened from `file://`, the model
+can't load and the page falls back to keyword matching.
+
+Rebuild the data (scrape, OpenReview lookup, embeddings) with:
+
+```
+pip install model2vec numpy
+python colm2026/build.py
+node colm2026/test_tokenizer.js   # checks the JS tokenizer against the Python one
+```

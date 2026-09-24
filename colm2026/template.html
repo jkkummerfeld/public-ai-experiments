@@ -1,0 +1,455 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>COLM 2026 Paper Scout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F5F6F4; --surface:#FFFFFF; --sunk:#ECEEEB; --line:#D9DDD8;
+  --ink:#1B2230; --ink-2:#4A5362; --ink-3:#7A8290;
+  --accent:#2E4BC6; --accent-soft:#E3E8FB; --on-accent:#FFFFFF;
+  --mark:#FFE58A; --star:#C98A00; --oral:#8A3FB8; --oral-soft:#F2E7F8;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#12161D; --surface:#1A2029; --sunk:#222935; --line:#2E3644;
+  --ink:#E7EAF0; --ink-2:#B3BAC6; --ink-3:#848C99;
+  --accent:#8FA5FF; --accent-soft:#26305A; --on-accent:#0F1320;
+  --mark:rgba(255,212,84,.30); --star:#F2C14E; --oral:#D19BF0; --oral-soft:#34264A;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#12161D; --surface:#1A2029; --sunk:#222935; --line:#2E3644;
+  --ink:#E7EAF0; --ink-2:#B3BAC6; --ink-3:#848C99;
+  --accent:#8FA5FF; --accent-soft:#26305A; --on-accent:#0F1320;
+  --mark:rgba(255,212,84,.30); --star:#F2C14E; --oral:#D19BF0; --oral-soft:#34264A;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+h1{font:600 30px/1.1 var(--serif);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--ink-2);margin:4px 0 0;font-size:13px}
+.tabs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:8px}
+.tabs button{border:0;background:transparent;color:var(--ink-2);font:500 13px var(--sans);padding:7px 14px;border-radius:6px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){.layout{grid-template-columns:minmax(0,1fr)}}
+aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:18px;max-height:calc(100vh - 24px);overflow:auto;padding-bottom:4px}
+@media (max-width:820px){aside{position:static;max-height:none}}
+.label{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:0 0 6px;display:flex;justify-content:space-between;gap:8px}
+.label .ex{color:var(--accent);letter-spacing:.04em}
+textarea,input[type="search"]{width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;font:14px/1.45 var(--sans);padding:9px 10px}
+textarea{min-height:150px;resize:vertical}
+textarea:focus,input:focus,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hint{font-size:12px;color:var(--ink-3);margin:6px 0 0}
+.hint code{font:12px var(--mono);background:var(--sunk);padding:0 4px;border-radius:3px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font:500 12px var(--mono);padding:5px 9px;border-radius:999px;cursor:pointer;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.sessgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sessgrid .chip{border-radius:6px;text-align:left;display:flex;flex-direction:column;line-height:1.3;padding:6px 8px}
+.sessgrid .chip small{font-size:10.5px;opacity:.8}
+.sync{font-size:12px;color:var(--ink-3)}
+main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.count{color:var(--ink-2);font-size:13px;font-variant-numeric:tabular-nums}
+.sort{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink-3)}
+.seed{display:flex;gap:8px;align-items:center;background:var(--accent-soft);border-radius:6px;padding:8px 12px;font-size:13px}
+.seed b{font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px}
+.card.starred{border-color:color-mix(in srgb,var(--star) 55%,var(--line))}
+.meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font:12px var(--mono);color:var(--ink-3);font-variant-numeric:tabular-nums}
+.meta .ps{color:var(--ink-2);font-weight:500}
+.tag-oral{background:var(--oral-soft);color:var(--oral);padding:1px 7px;border-radius:4px;font-weight:500}
+.card h3{font:600 18px/1.3 var(--serif);margin:2px 0 0;text-wrap:balance}
+.authors{color:var(--ink-2);font-size:13px;margin:2px 0 0}
+.why{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.why span{font:11.5px var(--mono);background:var(--accent-soft);color:var(--accent);padding:2px 7px;border-radius:4px}
+.tldr{margin:8px 0 0;color:var(--ink);max-width:72ch}
+details.abs{margin-top:6px}
+details.abs summary{cursor:pointer;color:var(--accent);font-size:13px;width:max-content}
+details.abs p{color:var(--ink-2);max-width:72ch;margin:6px 0 0}
+.kw{margin-top:6px;font-size:12px;color:var(--ink-3)}
+mark{background:var(--mark);color:inherit;padding:0 1px;border-radius:2px}
+.score{grid-row:2/span 2;grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:64px}
+.meter{width:64px;height:5px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent)}
+.score small{font:11px var(--mono);color:var(--ink-3)}
+.actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.btn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font:500 12.5px var(--sans);padding:5px 10px;border-radius:6px;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--ink-3);color:var(--ink)}
+.btn svg{width:14px;height:14px;flex:none}
+.btn.on{color:var(--star);border-color:color-mix(in srgb,var(--star) 60%,var(--line))}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.more{align-self:center;margin-top:6px}
+.empty{padding:32px;text-align:center;color:var(--ink-3);border:1px dashed var(--line);border-radius:8px}
+/* schedule */
+.sched{display:flex;flex-direction:column;gap:22px}
+.slot h2{font:600 20px/1.2 var(--serif);margin:0 0 2px}
+.slot .when{font:12px var(--mono);color:var(--ink-3);margin:0 0 8px}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+td.num{font:500 13px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td .t{font:600 14.5px/1.3 var(--serif)}
+td .a{color:var(--ink-3);font-size:12px}
+.slot .none{color:var(--ink-3);font-size:13px;margin:0}
+@media (prefers-reduced-motion:no-preference){.btn,.chip{transition:background .12s,border-color .12s,color .12s}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>COLM 2026 Paper Scout</h1>
+      <p class="sub" id="sub">856 accepted papers · San Francisco · 6–8 October · six poster sessions</p>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-browse" aria-selected="true">Find papers</button>
+      <button role="tab" id="tab-sched" aria-selected="false">My schedule <span id="starcount"></span></button>
+    </div>
+  </header>
+
+  <div class="layout" id="view-browse">
+    <aside>
+      <section>
+        <p class="label"><span>Your interests</span><span class="ex" id="exlabel">example list</span></p>
+        <textarea id="interests" spellcheck="false" aria-label="Your interests, one per line"></textarea>
+        <p class="hint">One topic per line. Papers are ranked by how well they match any line. Use <code>@Name</code> to follow an author, <code>-word</code> to push a topic down.</p>
+      </section>
+      <section>
+        <p class="label"><span>Search</span></p>
+        <input type="search" id="q" placeholder="Title, author, keyword, abstract…" autocomplete="off">
+      </section>
+      <section>
+        <p class="label"><span>Poster sessions</span></p>
+        <div class="sessgrid" id="sessions"></div>
+      </section>
+      <section>
+        <p class="label"><span>Show</span></p>
+        <div class="chips">
+          <button class="chip" id="f-star" aria-pressed="false">Starred only</button>
+          <button class="chip" id="f-oral" aria-pressed="false">Orals</button>
+          <button class="chip" id="f-link" aria-pressed="false">Has project page</button>
+          <button class="chip" id="f-hidden" aria-pressed="false">Hidden papers</button>
+        </div>
+      </section>
+      <p class="sync" id="modelstat">Loading the embedding model (10 MB)… keyword matching until it is ready.</p>
+      <p class="sync" id="sync">Saving in this browser.</p>
+    </aside>
+
+    <main>
+      <div class="bar">
+        <span class="count" id="count"></span>
+        <label class="sort">Sort
+          <span class="chips" id="sortchips">
+            <button class="chip" data-sort="match" aria-pressed="true">Best match</button>
+            <button class="chip" data-sort="session" aria-pressed="false">Session &amp; board</button>
+          </span>
+        </label>
+      </div>
+      <div class="seed" id="seed" hidden></div>
+      <div id="list" style="display:flex;flex-direction:column;gap:12px"></div>
+      <button class="btn more" id="more" hidden>Show more</button>
+    </main>
+  </div>
+
+  <div id="view-sched" hidden>
+    <div class="bar" style="margin-bottom:16px">
+      <span class="count" id="schedcount"></span>
+      <button class="btn" id="copy">Copy schedule as text</button>
+    </div>
+    <div class="sched" id="sched"></div>
+  </div>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(function(){
+const DATA=JSON.parse(document.getElementById('data').textContent);
+const P=DATA.papers, SESS=DATA.sessions;
+const byId=new Map(P.map((p,i)=>[p.id,i]));
+const DAYNAME={TUE:'Tuesday',WED:'Wednesday',THU:'Thursday'};
+const sessLabel=s=>{const d=SESS[s].day.split(' ');return {short:d[0][0]+d[0].slice(1).toLowerCase()+' '+SESS[s].time.replace(':00',''),long:DAYNAME[d[0]]+' '+d[1]+' '+d[2][0]+d[2].slice(1).toLowerCase()+' · '+SESS[s].time}};
+
+/* ---------- text processing ---------- */
+const STOP=new Set('a an and are as at be by for from has have in into is it its of on or that the their this to we with via our can do does how what when which while who why will not no than then these those using use based towards toward large language model models llm llms'.split(' '));
+function stem(w){
+  if(w.length>5&&w.endsWith('ies'))return w.slice(0,-3)+'y';
+  if(w.length>6&&w.endsWith('ing'))return w.slice(0,-3);
+  if(w.length>5&&w.endsWith('ed')&&!w.endsWith('eed'))return w.slice(0,-2);
+  if(w.length>4&&w.endsWith('es')&&/(ss|x|ch|sh)es$/.test(w))return w.slice(0,-2);
+  if(w.length>3&&w.endsWith('s')&&!w.endsWith('ss')&&!w.endsWith('us')&&!w.endsWith('is'))return w.slice(0,-1);
+  return w;
+}
+const WORD=/[a-z0-9]+/g;
+function toks(s){const out=[];for(const m of s.toLowerCase().matchAll(WORD)){const w=m[0];if(w.length<2||STOP.has(w))continue;out.push(stem(w))}return out}
+
+/* weighted BM25 index (search box, keyword part of interest matching, highlighting) */
+const FW=[['t',3],['k',2],['tl',1.5],['ab',1]];
+const N=P.length, docLen=new Float32Array(N), inv=new Map();
+P.forEach((p,i)=>{
+  const tf=new Map();let len=0;
+  for(const [f,w] of FW){const v=Array.isArray(p[f])?p[f].join(' '):p[f];for(const t of toks(v||'')){tf.set(t,(tf.get(t)||0)+w);len+=w}}
+  docLen[i]=len;
+  for(const [t,c] of tf){let l=inv.get(t);if(!l)inv.set(t,l=[]);l.push([i,c])}
+  p._low=(p.t+' '+p.tl+' '+p.ab+' '+p.k.join(' ')).toLowerCase();
+  p._auth=p.a.join(' · ').toLowerCase();
+});
+const avgLen=docLen.reduce((a,b)=>a+b,0)/N;
+const idf=t=>{const l=inv.get(t);if(!l)return 0;return Math.log(1+(N-l.length+.5)/(l.length+.5))};
+function bm25(terms){
+  const sc=new Float32Array(N), k1=1.2,b=.75;
+  for(const t of new Set(terms)){const l=inv.get(t);if(!l)continue;const w=idf(t);for(const [i,c] of l){sc[i]+=w*c*(k1+1)/(c+k1*(1-b+b*docLen[i]/avgLen))}}
+  return sc;
+}
+function norm(arr){let m=0;for(const v of arr)if(v>m)m=v;if(m>0)for(let i=0;i<arr.length;i++)arr[i]/=m;return arr}
+
+/* paper embeddings: potion-base-8M (model2vec), int8, one row per paper */
+const DIM=DATA.dim;
+const PV=(()=>{const raw=atob(DATA.emb),v=new Float32Array(N*DIM);for(let i=0;i<raw.length;i++){const b=raw.charCodeAt(i);v[i]=b>127?b-256:b}
+  for(let i=0;i<N;i++){let n=0;for(let d=0;d<DIM;d++)n+=v[i*DIM+d]**2;n=Math.sqrt(n)||1;for(let d=0;d<DIM;d++)v[i*DIM+d]/=n}return v})();
+function cosAll(q){const sc=new Float32Array(N);for(let i=0;i<N;i++){let s=0;const o=i*DIM;for(let d=0;d<DIM;d++)s+=PV[o+d]*q[d];sc[i]=s}return sc}
+// rescale similarities so the paper-set mean maps to 0 and the best match to 1
+function relScale(sc,skip){let m=0,mx=-1,k=0;for(let i=0;i<N;i++){if(skip&&skip.has(i))continue;m+=sc[i];k++;if(sc[i]>mx)mx=sc[i]}m/=k||1;const r=new Float32Array(N);for(let i=0;i<N;i++)r[i]=skip&&skip.has(i)?0:Math.max(0,(sc[i]-m)/((mx-m)||1));return r}
+function paperVec(i){return PV.subarray(i*DIM,(i+1)*DIM)}
+function meanVec(idxs){const c=new Float32Array(DIM);for(const i of idxs){const v=paperVec(i);for(let d=0;d<DIM;d++)c[d]+=v[d]}return c}
+
+/* query embeddings: a port of the model's BERT WordPiece tokenizer, then mean of token vectors */
+/*TOK-START*/
+function makeTokenizer(vocabList){
+  const vocab=new Map(vocabList.map((t,i)=>[t,i]));const UNK=vocab.get('[UNK]');
+  const isCtrl=c=>{if(c==='\t'||c==='\n'||c==='\r')return false;return /[\p{Cc}\p{Cf}]/u.test(c)};
+  const isWS=c=>c===' '||c==='\t'||c==='\n'||c==='\r'||/\p{Zs}/u.test(c);
+  const isCJK=cp=>(cp>=0x4E00&&cp<=0x9FFF)||(cp>=0x3400&&cp<=0x4DBF)||(cp>=0x20000&&cp<=0x2A6DF)||(cp>=0x2A700&&cp<=0x2B73F)||(cp>=0x2B740&&cp<=0x2B81F)||(cp>=0x2B820&&cp<=0x2CEAF)||(cp>=0xF900&&cp<=0xFAFF)||(cp>=0x2F800&&cp<=0x2FA1F);
+  const isPunc=c=>{const cp=c.codePointAt(0);return (cp>=33&&cp<=47)||(cp>=58&&cp<=64)||(cp>=91&&cp<=96)||(cp>=123&&cp<=126)||/\p{P}/u.test(c)};
+  function normalize(text){let o='';for(const c of text){const cp=c.codePointAt(0);if(cp===0||cp===0xFFFD||isCtrl(c))continue;if(isWS(c))o+=' ';else if(isCJK(cp))o+=' '+c+' ';else o+=c}
+    return o.normalize('NFD').replace(/\p{Mn}/gu,'').toLowerCase()}
+  function pretok(text){const out=[];let cur='';for(const c of text){if(c===' '){if(cur)out.push(cur);cur=''}else if(isPunc(c)){if(cur)out.push(cur);cur='';out.push(c)}else cur+=c}if(cur)out.push(cur);return out}
+  function wordpiece(w){const ch=[...w];if(ch.length>100)return [UNK];const ids=[];let s=0;
+    while(s<ch.length){let e=ch.length,id=null;while(s<e){let sub=ch.slice(s,e).join('');if(s>0)sub='##'+sub;const v=vocab.get(sub);if(v!==undefined){id=v;break}e--}
+      if(id===null)return [UNK];ids.push(id);s=e}return ids}
+  return text=>{const ids=[];for(const w of pretok(normalize(text)))for(const id of wordpiece(w))if(id!==UNK)ids.push(id);return ids};
+}
+/*TOK-END*/
+let model=null;
+async function loadModel(){
+  try{
+    const [vr,br]=await Promise.all([fetch('model/vocab.txt'),fetch('model/potion-base-8M.b64.txt')]);
+    if(!vr.ok||!br.ok)throw new Error('missing');
+    const vocab=(await vr.text()).split('\n'),b64=atob(await br.text()),buf=new ArrayBuffer(b64.length),u8=new Uint8Array(buf);for(let i=0;i<b64.length;i++)u8[i]=b64.charCodeAt(i);
+    const [rows,dim]=new Uint32Array(buf,0,2);
+    const scale=new Float32Array(buf,8,rows),E=new Int8Array(buf,8+4*rows,rows*dim);
+    const tok=makeTokenizer(vocab);
+    model={embed(text){const ids=tok(text);if(!ids.length)return null;const v=new Float32Array(dim);for(const id of ids){const s=scale[id],o=id*dim;for(let d=0;d<dim;d++)v[d]+=E[o+d]*s}
+      let n=0;for(let d=0;d<dim;d++)n+=v[d]*v[d];n=Math.sqrt(n)||1;for(let d=0;d<dim;d++)v[d]/=n;return v}};
+    $('modelstat').textContent='Ranked by meaning with a small local embedding model (potion-base-8M), plus a little weight on exact keyword matches.';
+    recompute();render();
+  }catch(e){$('modelstat').textContent='The embedding model could not load, so interests are matched by keywords only.'}
+}
+
+/* ---------- state ---------- */
+const EXAMPLE='dialogue and conversational agents\nhuman-AI collaboration\ntext-to-SQL and semantic parsing\nevaluation methodology and benchmarks\ncode generation';
+const LSKEY='colm26-scout';
+let st={interests:EXAMPLE,edited:false,stars:[],hidden:[]};
+try{const s=JSON.parse(localStorage.getItem(LSKEY)||'null');if(s)st=Object.assign(st,s)}catch(e){}
+let ui={view:'browse',q:'',sess:new Set(),fStar:false,fOral:false,fLink:false,fHidden:false,sort:'match',seed:null,limit:40};
+let dbDoc=null,saveTimer=null,saving=false,dirty=false;
+function persist(){
+  try{localStorage.setItem(LSKEY,JSON.stringify(st))}catch(e){}
+  if(!dbDoc)return;
+  dirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(flush,700);
+}
+async function flush(){
+  if(saving||!dirty||!dbDoc)return;saving=true;dirty=false;
+  try{await dbDoc.set({interests:st.interests,edited:st.edited,stars:st.stars,hidden:st.hidden});setSync('Saved to your Claude account — it follows you to other devices.')}
+  catch(e){setSync('Could not save to your account; saving in this browser only.')}
+  saving=false;if(dirty)flush();
+}
+function setSync(t){document.getElementById('sync').textContent=t}
+(async()=>{
+  try{
+    if(!window.claude||!window.claude.use)return;
+    const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
+    if(!db||!user)return;
+    const uid=await user.id();if(!uid)return;
+    const ref=db.doc('data/users/'+uid+'/state');
+    const snap=await ref.get();
+    if(snap.exists){const d=snap.data()||{};
+      const localHas=st.stars.length||st.hidden.length||st.edited;
+      if(!localHas||(d.stars&&d.stars.length)||d.edited){
+        st.interests=typeof d.interests==='string'?d.interests:st.interests;st.edited=!!d.edited;
+        st.stars=[...new Set([...(d.stars||[]),...st.stars])].filter(id=>byId.has(id));
+        st.hidden=[...new Set([...(d.hidden||[]),...st.hidden])].filter(id=>byId.has(id));
+        document.getElementById('interests').value=st.interests;recompute();render();
+      }
+    }
+    dbDoc=ref;setSync('Saved to your Claude account — it follows you to other devices.');
+    if(!snap.exists&&(st.stars.length||st.edited)){dirty=true;flush()}
+  }catch(e){}
+})();
+
+/* ---------- scoring ---------- */
+let base=new Float32Array(N), whyTopics=[], hiTerms=new Set(), seedSim=null, starSim=null;
+const embCache=new Map();
+function embedLine(l){if(!model)return null;if(!embCache.has(l))embCache.set(l,model.embed(l));return embCache.get(l)}
+function topicScores(line){
+  const raw=line.trim();
+  if(raw.startsWith('@')){const name=raw.slice(1).trim().toLowerCase();const sc=new Float32Array(N);if(name.length>=3)P.forEach((p,i)=>{if(p._auth.includes(name))sc[i]=1});return {sc,terms:[]}}
+  const terms=toks(raw);const lx=bm25(terms);
+  const phrase=raw.toLowerCase().replace(/\s+/g,' ');
+  if(terms.length>1)P.forEach((p,i)=>{if(lx[i]>0&&p._low.includes(phrase))lx[i]*=1.35});
+  norm(lx);
+  const q=embedLine(raw);
+  if(!q)return {sc:lx,terms};
+  const se=relScale(cosAll(q)),sc=new Float32Array(N);
+  for(let i=0;i<N;i++)sc[i]=.7*se[i]+.3*lx[i];
+  return {sc:norm(sc),terms};
+}
+function computeStarSim(){
+  if(!st.stars.length){starSim=null;return}
+  const idxs=st.stars.map(id=>byId.get(id)).filter(i=>i!==undefined);
+  starSim=relScale(cosAll(meanVec(idxs)),new Set(idxs));
+}
+function recompute(){
+  const lines=st.interests.split('\n').map(s=>s.trim()).filter(Boolean);
+  const pos=[],neg=[];hiTerms=new Set();
+  for(const l of lines){if(l.startsWith('-')){neg.push(topicScores(l.slice(1)))}else{const r=topicScores(l);r.label=l;pos.push(r);r.terms.forEach(t=>hiTerms.add(t))}}
+  base=new Float32Array(N);whyTopics=Array.from({length:N},()=>[]);
+  for(let i=0;i<N;i++){let mx=0,sum=0;for(const r of pos){const v=r.sc[i];sum+=v;if(v>mx)mx=v;if(v>=.5)whyTopics[i].push([r.label,v])}
+    let s=mx+.2*(sum-mx);for(const r of neg)s-=.6*r.sc[i];base[i]=s;whyTopics[i].sort((a,b)=>b[1]-a[1])}
+  computeStarSim();
+}
+function scoresNow(){
+  const qTerms=toks(ui.q), qLow=ui.q.trim().toLowerCase();
+  let qs=null;
+  if(qLow){qs=norm(bm25(qTerms));P.forEach((p,i)=>{if(qLow.length>=3&&p._auth.includes(qLow))qs[i]=Math.max(qs[i],1);if(qs[i]>0&&p._low.includes(qLow))qs[i]=Math.min(1,qs[i]*1.3)})}
+  const out=new Float32Array(N);
+  for(let i=0;i<N;i++){let s=base[i];if(starSim)s+=.5*starSim[i];if(seedSim)s=seedSim[i]*2+.3*s;if(qs)s=qs[i]>0?qs[i]*2+.3*s:-1;out[i]=s}
+  return {out,qTerms,qs};
+}
+
+/* ---------- render ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function hl(text,set){if(!set.size)return esc(text);let out='',last=0;for(const m of text.matchAll(/[A-Za-z0-9]+/g)){const w=m[0].toLowerCase();out+=esc(text.slice(last,m.index));out+=(w.length>1&&set.has(stem(w)))?'<mark>'+esc(m[0])+'</mark>':esc(m[0]);last=m.index+m[0].length}return out+esc(text.slice(last))}
+const ICON={
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
+  starOn:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
+  hide:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c5 0 9 5 9 7a9 9 0 0 1-2.3 3.1M6.2 6.3C4 7.7 3 10.6 3 12c0 2 4 7 9 7a9.6 9.6 0 0 0 4.3-1"/></svg>',
+  like:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M11 8v6M8 11h6"/></svg>',
+  ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
+};
+function metaLine(p){
+  const L=sessLabel(p.s);
+  let m='<span class="ps">Poster Session '+p.s+'</span><span>'+esc(L.short)+'</span><span>'+esc(p.r)+' · board #'+p.n+'</span>';
+  if(p.o){const d=p.o[0].split(' ')[0];m+='<span class="tag-oral">Oral · '+d[0]+d.slice(1).toLowerCase()+' '+esc(p.o[1])+' · '+esc(p.o[2])+'</span>'}
+  return m;
+}
+function card(p,i,score,top,terms){
+  const starred=st.stars.includes(p.id), hidden=st.hidden.includes(p.id);
+  const why=whyTopics[i].slice(0,3).map(w=>'<span>'+esc(w[0])+'</span>').join('')+(starSim&&starSim[i]>.6?'<span>like your stars</span>':'');
+  const pct=top>0?Math.max(0,Math.min(1,score/top)):0;
+  return '<article class="card'+(starred?' starred':'')+'" data-id="'+p.id+'">'+
+    '<div class="meta">'+metaLine(p)+'</div>'+
+    '<div><h3>'+hl(p.t,terms)+'</h3><p class="authors">'+hl(p.a.join(', '),new Set())+'</p>'+(why?'<div class="why">'+why+'</div>':'')+
+    (p.tl?'<p class="tldr">'+hl(p.tl,terms)+'</p>':'')+
+    '<details class="abs"><summary>Abstract</summary><p>'+hl(p.ab,terms)+'</p></details>'+
+    (p.k.length?'<div class="kw">'+esc(p.k.join(' · '))+'</div>':'')+'</div>'+
+    (ui.sort==='match'&&score>0?'<div class="score"><div class="meter"><i style="width:'+(pct*100).toFixed(0)+'%"></i></div><small>'+(pct*100).toFixed(0)+'</small></div>':'<div></div>')+
+    '<div class="actions">'+
+      '<button class="btn'+(starred?' on':'')+'" data-act="star" aria-pressed="'+starred+'">'+(starred?ICON.starOn+'Starred':ICON.star+'Star')+'</button>'+
+      '<button class="btn" data-act="like">'+ICON.like+'More like this</button>'+
+      '<button class="btn" data-act="hide">'+ICON.hide+(hidden?'Unhide':'Hide')+'</button>'+
+      '<a class="btn" href="https://openreview.net/forum?id='+p.id+'" target="_blank" rel="noopener">'+ICON.ext+'OpenReview</a>'+
+      (p.l?'<a class="btn" href="'+esc(p.l)+'" target="_blank" rel="noopener">'+ICON.ext+'Project page</a>':'')+
+    '</div></article>';
+}
+function render(){
+  $('starcount').textContent=st.stars.length?'('+st.stars.length+')':'';
+  $('exlabel').hidden=st.edited;
+  if(ui.view==='sched')return renderSched();
+  const {out,qTerms}=scoresNow();
+  const terms=new Set([...hiTerms,...qTerms]);
+  let idx=[];const hid=new Set(st.hidden),sta=new Set(st.stars);
+  for(let i=0;i<N;i++){const p=P[i];
+    if(ui.fHidden?!hid.has(p.id):hid.has(p.id))continue;
+    if(ui.sess.size&&!ui.sess.has(p.s))continue;
+    if(ui.fStar&&!sta.has(p.id))continue;
+    if(ui.fOral&&!p.o)continue;
+    if(ui.fLink&&!p.l)continue;
+    if(out[i]<0)continue;
+    if(ui.seed&&P[i].id===ui.seed)continue;
+    idx.push(i)}
+  if(ui.sort==='match')idx.sort((a,b)=>out[b]-out[a]||a-b);
+  else idx.sort((a,b)=>P[a].s-P[b].s||P[a].r.localeCompare(P[b].r)||P[a].n-P[b].n);
+  const top=idx.length?Math.max(...idx.slice(0,1).map(i=>out[i])):0;
+  $('count').textContent=idx.length+' paper'+(idx.length===1?'':'s')+(ui.q?' matching “'+ui.q.trim()+'”':'');
+  const sd=$('seed');
+  if(ui.seed){const p=P[byId.get(ui.seed)];sd.hidden=false;sd.innerHTML='<span>Showing papers similar to <b>'+esc(p.t)+'</b></span><button class="btn" id="clearseed">Clear</button>'}else sd.hidden=true;
+  const shown=idx.slice(0,ui.limit);
+  $('list').innerHTML=shown.length?shown.map(i=>card(P[i],i,out[i],top,terms)).join(''):'<div class="empty">No papers match these filters.</div>';
+  $('more').hidden=idx.length<=ui.limit;
+  $('more').textContent='Show '+Math.min(40,idx.length-ui.limit)+' more of '+(idx.length-ui.limit)+' remaining';
+}
+function schedRows(){
+  const rows={};for(const id of st.stars){const p=P[byId.get(id)];if(p)(rows[p.s]=rows[p.s]||[]).push(p)}
+  for(const s in rows)rows[s].sort((a,b)=>a.r.localeCompare(b.r)||a.n-b.n);return rows;
+}
+function renderSched(){
+  const rows=schedRows();
+  const orals=st.stars.map(id=>P[byId.get(id)]).filter(p=>p&&p.o);
+  $('schedcount').textContent=st.stars.length?st.stars.length+' starred paper'+(st.stars.length===1?'':'s')+', grouped by poster session and sorted by room and board number':'Star papers in “Find papers” to build your schedule.';
+  let h='';
+  if(orals.length){h+='<section class="slot"><h2>Starred orals</h2><p class="when">Grand Ballroom · 15-minute talks</p><div class="tablewrap"><table><thead><tr><th>When</th><th>Paper</th></tr></thead><tbody>'+
+    orals.sort((a,b)=>a.o[0].localeCompare(b.o[0])||a.o[1].localeCompare(b.o[1])).map(p=>{const d=p.o[0].split(' ');return '<tr><td class="num">'+d[0][0]+d[0].slice(1).toLowerCase()+' '+d[1]+' Oct '+esc(p.o[1])+'</td><td><div class="t">'+esc(p.t)+'</div><div class="a">'+esc(p.o[2])+' · '+esc(p.a.join(', '))+'</div></td></tr>'}).join('')+'</tbody></table></div></section>'}
+  for(let s=1;s<=6;s++){const L=sessLabel(s),r=rows[s]||[];
+    h+='<section class="slot"><h2>Poster Session '+s+'</h2><p class="when">'+esc(L.long)+' · '+r.length+' starred</p>';
+    if(!r.length)h+='<p class="none">Nothing starred in this session.</p>';
+    else h+='<div class="tablewrap"><table><thead><tr><th>Room</th><th>Board</th><th>Paper</th><th></th></tr></thead><tbody>'+r.map(p=>'<tr data-id="'+p.id+'"><td>'+esc(p.r)+'</td><td class="num">#'+p.n+'</td><td><div class="t">'+esc(p.t)+'</div><div class="a">'+esc(p.a.join(', '))+'</div></td><td><button class="btn" data-act="star" aria-label="Remove star">'+ICON.starOn+'</button></td></tr>').join('')+'</tbody></table></div>';
+    h+='</section>'}
+  $('sched').innerHTML=h;
+}
+function schedText(){
+  const rows=schedRows();let t='My COLM 2026 schedule\n';
+  for(let s=1;s<=6;s++){const r=rows[s];if(!r)continue;t+='\nPoster Session '+s+' — '+sessLabel(s).long+'\n';for(const p of r)t+='  '+p.r+' #'+p.n+'  '+p.t+'\n    '+p.a.join(', ')+'\n    https://openreview.net/forum?id='+p.id+'\n'}
+  const orals=st.stars.map(id=>P[byId.get(id)]).filter(p=>p&&p.o);
+  if(orals.length){t+='\nOrals\n';for(const p of orals)t+='  '+p.o[0]+' '+p.o[1]+' ('+p.o[2]+')  '+p.t+'\n'}
+  return t;
+}
+
+/* ---------- wiring ---------- */
+const ta=$('interests');ta.value=st.interests;
+let rt=null;
+ta.addEventListener('input',()=>{st.interests=ta.value;st.edited=true;persist();clearTimeout(rt);rt=setTimeout(()=>{recompute();ui.limit=40;render()},180)});
+$('q').addEventListener('input',e=>{ui.q=e.target.value;ui.limit=40;clearTimeout(rt);rt=setTimeout(render,120)});
+$('sessions').innerHTML=[1,2,3,4,5,6].map(s=>{const L=sessLabel(s);const n=P.filter(p=>p.s===s).length;return '<button class="chip" data-s="'+s+'" aria-pressed="false">PS'+s+' '+esc(L.short.split(' ')[0])+'<small>'+esc(SESS[s].time.replace(':00',''))+' · '+n+'</small></button>'}).join('');
+$('sessions').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;const s=+b.dataset.s;ui.sess.has(s)?ui.sess.delete(s):ui.sess.add(s);b.setAttribute('aria-pressed',ui.sess.has(s));ui.limit=40;render()});
+for(const [id,key] of [['f-star','fStar'],['f-oral','fOral'],['f-link','fLink'],['f-hidden','fHidden']])$(id).addEventListener('click',e=>{ui[key]=!ui[key];e.currentTarget.setAttribute('aria-pressed',ui[key]);ui.limit=40;render()});
+$('sortchips').addEventListener('click',e=>{const b=e.target.closest('[data-sort]');if(!b)return;ui.sort=b.dataset.sort;for(const c of $('sortchips').children)c.setAttribute('aria-pressed',c===b);render()});
+$('more').addEventListener('click',()=>{ui.limit+=40;render()});
+function toggle(arr,id){const k=arr.indexOf(id);k>=0?arr.splice(k,1):arr.push(id)}
+document.addEventListener('click',e=>{
+  if(e.target.closest('#clearseed')){ui.seed=null;seedSim=null;render();return}
+  const b=e.target.closest('[data-act]');if(!b)return;const id=b.closest('[data-id]').dataset.id;
+  const act=b.dataset.act;
+  if(act==='star'){toggle(st.stars,id);computeStarSim();persist();
+    if(ui.view==='browse'){const y=b.closest('.card').getBoundingClientRect().top;render();const el=document.querySelector('[data-id="'+id+'"]');if(el)window.scrollBy(0,el.getBoundingClientRect().top-y)}else render()}
+  else if(act==='hide'){toggle(st.hidden,id);if(st.hidden.includes(id))st.stars=st.stars.filter(x=>x!==id);persist();render()}
+  else if(act==='like'){ui.seed=id;seedSim=relScale(cosAll(paperVec(byId.get(id))),new Set([byId.get(id)]));ui.sort='match';for(const c of $('sortchips').children)c.setAttribute('aria-pressed',c.dataset.sort==='match');ui.limit=40;render();$('seed').scrollIntoView({block:'nearest'})}
+});
+function setView(v){ui.view=v;$('tab-browse').setAttribute('aria-selected',v==='browse');$('tab-sched').setAttribute('aria-selected',v==='sched');$('view-browse').hidden=v!=='browse';$('view-sched').hidden=v!=='sched';render()}
+$('tab-browse').addEventListener('click',()=>setView('browse'));
+$('tab-sched').addEventListener('click',()=>setView('sched'));
+$('copy').addEventListener('click',async e=>{const t=schedText(),b=e.currentTarget;try{await navigator.clipboard.writeText(t);b.textContent='Copied'}catch(err){const pre=document.createElement('textarea');pre.value=t;pre.style.minHeight='240px';b.after(pre);pre.select();b.textContent='Select and copy the text below'}setTimeout(()=>b.textContent='Copy schedule as text',2500)});
+if(location.hash==='#schedule')setView('sched');
+recompute();render();loadModel();
+})();
+</script>
