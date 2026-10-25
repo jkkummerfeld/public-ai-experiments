@@ -12,6 +12,12 @@ concurrency:
   group: sydney-deal-feed
   cancel-in-progress: false
 
+env:
+  # main is protected (changes must go through a pull request), so the
+  # generated feed is published to its own branch instead.
+  FEED_BRANCH: feeds
+  FEED_FILE: feed/sydney-deals.xml
+
 jobs:
   update-feed:
     runs-on: ubuntu-latest
@@ -22,17 +28,39 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Check out feed branch
+        run: |
+          if git ls-remote --exit-code --heads origin "$FEED_BRANCH" >/dev/null; then
+            git fetch --depth=1 origin "+refs/heads/$FEED_BRANCH:refs/remotes/origin/$FEED_BRANCH"
+            git worktree add -B "$FEED_BRANCH" feed-branch "origin/$FEED_BRANCH"
+          else
+            # First run: start the branch from the feed file on main.
+            git worktree add --orphan -b "$FEED_BRANCH" feed-branch
+          fi
+          if [ ! -f "feed-branch/$FEED_FILE" ] && [ -f "$FEED_FILE" ]; then
+            mkdir -p "feed-branch/$(dirname "$FEED_FILE")"
+            cp "$FEED_FILE" "feed-branch/$FEED_FILE"
+          fi
+
       - name: Update feed
-        run: python3 scripts/update_city_feed.py --city Sydney --output feed/sydney-deals.xml
+        run: python3 scripts/update_city_feed.py --city Sydney --output "feed-branch/$FEED_FILE"
 
       - name: Commit and push if changed
+        working-directory: feed-branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add feed/sydney-deals.xml
+          git add "$FEED_FILE"
           if git diff --staged --quiet; then
             echo "No changes to commit."
-          else
-            git commit -m "Update Sydney flight deal feed"
-            git push
+            exit 0
           fi
+          git commit -m "Update Sydney flight deal feed"
+          # Other city workflows may push to the same branch; retry on races.
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:$FEED_BRANCH"; then
+              exit 0
+            fi
+            git pull --rebase origin "$FEED_BRANCH"
+          done
+          exit 1
